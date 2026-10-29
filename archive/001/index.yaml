@@ -1,0 +1,8 @@
+id: "001"
+title: "OpenAI set-preserving compression and ordinary counting"
+status: imported
+result: "For each fixed clause width, import the OpenAI manuscript's deterministic exact model-counting algorithm, its disjoint sparsification on the same declared Boolean variables, and its unweighted greedy compression to a sparse parity-equation system with exactly the original satisfying assignments. The paper states a sharper exponent O(N log log N/sqrt(log N)); the conservative interpolation and documented Lean scope use O(N (log log N)^2/sqrt(log N)). These are external contracts, not a local implementation or local formal verification."
+primary_proof:
+  method: external
+  requires: []
+  motivated_by: []

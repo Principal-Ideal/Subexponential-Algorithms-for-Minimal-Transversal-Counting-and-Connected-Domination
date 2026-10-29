@@ -1,0 +1,8 @@
+id: "015"
+title: "Parity-preserving witness self-reduction"
+status: established
+result: "Given a root, fixed vertex weights, and a known odd coefficient for size k and weight W in the connected-domination generating polynomial, a connected dominating witness can be recovered deterministically with at most n further exact coefficient queries by fixing only selection variables. The same original graph and domination clauses are retained throughout. A direct final graph check verifies the returned witness. This is an oracle-query theorem; its fast runtime additionally uses the conditional weighted bridge."
+primary_proof:
+  method: hand
+  requires: ["013"]
+  motivated_by: []

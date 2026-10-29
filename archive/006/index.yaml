@@ -1,0 +1,8 @@
+id: "006"
+title: "Unique-extension XOR difference-of-counts bridge"
+status: established
+result: "For a CNF with N base variables and a sign equal to parity of s distinct base variables, two formulas with N+max(0,s-1) declared variables encode even and odd sign, using four width-three clauses per XOR gate and a final parity unit when s>0. Every satisfying base assignment has exactly one gate extension. The difference of their ordinary model counts equals the signed sum. When s=0, the even formula is the base formula and the odd formula additionally contains an empty clause."
+primary_proof:
+  method: hand
+  requires: []
+  motivated_by: []

@@ -1,0 +1,8 @@
+id: "018"
+title: "SCC-subset deletion family is complete"
+status: established
+result: "For a CNF F, put an arc u to v whenever some clause contains a negative occurrence of u and a positive occurrence of v. All nonempty subsets of every strongly connected component form a complete fixed deletion-evidence family. Its size is ell=sum_C (2^{|C|}-1), so maximum SCC size b gives ell<=n 2^b and the compiler uses n+ell+max(0,ell-1) variables. This is a sufficient structural bound, not a bound by directed feedback vertex number alone."
+primary_proof:
+  method: hand
+  requires: ["017"]
+  motivated_by: []

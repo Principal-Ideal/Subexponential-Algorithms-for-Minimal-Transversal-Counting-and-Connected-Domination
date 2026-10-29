@@ -1,0 +1,8 @@
+id: "017"
+title: "Fixed deletion-evidence family compiler"
+status: established
+result: "Let F be a fixed-width k-CNF on n variables and let B_1,...,B_ell be a fixed family of nonempty variable sets such that every nonminimal model D admits some B_i contained in D with D minus B_i still a model. A signed CNF on n+ell base variables has pointwise sum equal to the indicator of inclusion-minimal models of F. Applying the XOR bridge gives two formulas on n+ell+max(0,ell-1) variables of width at most max(k+1,3). Completeness of the supplied deletion family is an explicit assumption."
+primary_proof:
+  method: hand
+  requires: ["006"]
+  motivated_by: ["005", "019"]

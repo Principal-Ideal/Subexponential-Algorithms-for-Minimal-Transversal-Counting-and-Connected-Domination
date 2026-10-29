@@ -1,0 +1,8 @@
+id: "014"
+title: "Conditional randomized connected-domination decision"
+status: conditional
+result: "Assuming the unary monomial-weight bridge, existence of a nonempty connected dominating set of size at most k in an arbitrary-density n-vertex simple undirected graph can be decided with one-sided error in polynomial overhead times 2^{O(n (log log(n+16))^2/sqrt(log(n+16)))} and polynomial space. Query all roots separately for each of t independent vertex-weight trials. A detected odd coefficient is sound; if a feasible set exists the probability of no detection is at most 2^(-t). Empty graphs have no feasible nonempty set by convention."
+primary_proof:
+  method: hand
+  requires: ["003", "011", "013"]
+  motivated_by: []

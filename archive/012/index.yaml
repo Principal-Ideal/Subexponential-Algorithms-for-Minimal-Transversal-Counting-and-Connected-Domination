@@ -1,0 +1,8 @@
+id: "012"
+title: "Three-variable-per-vertex connected-domination fibres"
+status: established
+result: "For every nonempty simple undirected graph G with root r, a width-three CNF with exactly 3n declared variables and 2n+4m+2 raw clauses has the following fixed-selection fibres. If r is not in D the fibre is empty. Otherwise its ordinary cardinality is 2^{u(D)+cc(G[D])-1}, where u(D) is the number of undominated original vertices. Giving each domination flag a negative weight at one changes the fibre sum to [D dominates G] 2^{cc(G[D])-1}. Connected dominating sets are required to be nonempty."
+primary_proof:
+  method: hand
+  requires: []
+  motivated_by: []

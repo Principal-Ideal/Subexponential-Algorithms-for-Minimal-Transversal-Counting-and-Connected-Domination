@@ -1,0 +1,26 @@
+# Local reproduction output
+/workspace/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# TeX build products (proof sources are retained)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+
+# Local editor / operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,8 @@
+id: "003"
+title: "Isolation with bounded independent integer weights"
+status: imported
+result: "For every nonempty family of subsets of an n-element universe, independently uniform element weights in {1,...,R} give a unique minimum-weight member with probability at least 1-n/R. Choosing the smallest power of two R at least 2n makes one trial succeed with probability at least 1/2 and uses a fixed number of random bits per weight; independent repetitions fail with probability at most 2^(-t). The family must be fixed independently of the sampled weights."
+primary_proof:
+  method: external
+  requires: []
+  motivated_by: []

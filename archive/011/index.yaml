@@ -1,0 +1,8 @@
+id: "011"
+title: "Conditional unary signed monomial-weight bridge"
+status: conditional
+result: "For each fixed CNF width and fixed number of formal markers, assume the imported OpenAI interpolation and compression results. A CNF on N declared variables with per-variable, per-bit weight zero or a signed monomial has its entire exact weighted model-count coefficient array computable in poly(N,M,A_1,...,A_r) times 2^{O(N (log log(N+16))^2/sqrt(log(N+16)))} and polynomial space in those parameters, where A_j bounds the total degree of marker j. Polynomially bounded marker degrees are required for polynomial overhead in the original input size. This archive covers unary factorized weights only, not dense binary factors."
+primary_proof:
+  method: hand
+  requires: ["001", "002"]
+  motivated_by: []

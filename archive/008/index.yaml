@@ -1,0 +1,8 @@
+id: "008"
+title: "Minimal domination and set-cover correspondences"
+status: established
+result: "For a finite simple undirected graph, the hypergraph with one indexed closed neighborhood per vertex has exactly the graph's dominating sets as its transversals, with inclusion-minimality and cardinality preserved. For a set system, transposing item-set incidence similarly identifies inclusion-minimal set covers with minimal transversals on the selectable sets. Repeated neighborhoods remain legal indexed edges."
+primary_proof:
+  method: hand
+  requires: []
+  motivated_by: []

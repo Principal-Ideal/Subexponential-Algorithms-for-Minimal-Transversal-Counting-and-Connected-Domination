@@ -1,0 +1,8 @@
+id: "009"
+title: "Conditional exact minimal-solution algorithms"
+status: conditional
+result: "Assuming the imported ordinary fixed-width counting algorithm, minimal transversals can be counted exactly, including their full size distribution, in polynomial input overhead times 2^{O(s (log log(s+16))^2/sqrt(log(s+16)))}, where s=p+q; the sharper ordinary paper exponent is available if that stronger external theorem is assumed. The same applies to minimal dominating sets with s=2n and to transposed minimal set covers. The implementations in this project are small-instance validators, not implementations of this subexponential algorithm."
+primary_proof:
+  method: hand
+  requires: ["001", "005", "006", "007", "008"]
+  motivated_by: []

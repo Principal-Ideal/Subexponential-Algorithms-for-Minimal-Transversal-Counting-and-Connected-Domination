@@ -1,0 +1,431 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\poly}{\operatorname{poly}}
+\newcommand{\cc}{\operatorname{cc}}
+\newcommand{\ind}[1]{\mathbf 1\{#1\}}
+\newcommand{\rhoN}[1]{\frac{#1(\log\log(#1+16))^2}{\sqrt{\log(#1+16)}}}
+\title{Connected Dominating Set via Monomial-Weighted SAT Counting\\
+\large A linear-variable parity reduction and randomized subexponential search}
+\author{}
+\date{29 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We construct a width-three CNF with exactly $3n$ variables and
+$2n+4m+2$ clauses for a rooted $n$-vertex, $m$-edge graph. For a fixed
+selected set $D$ containing the root, its number of extensions is
+$2^{u(D)+\cc(G[D])-1}$, where $u(D)$ counts undominated vertices.
+Thus its extension parity is precisely the indicator that $D$ is a connected
+dominating set. Polynomially bounded isolation weights, attached as formal
+monomials, give randomized decision, witness recovery, and optimization.
+We prove the required monomial-weight extension of the interpolation route
+in the supplied OpenAI manuscript. This yields time
+$(n+m+1)^{O(1)}2^{O(n(\log\log n)^2/\sqrt{\log n})}$ and polynomial
+space on arbitrary-density graphs, with one-sided error for decision.
+The supplied SAT algorithm is an external theorem; the extension here is
+not part of the linked Lean scope. Implementations accompanying this note
+are exponential small-instance validators, not implementations of that
+subexponential algorithm. No historical priority claim is made.
+\end{abstract}
+
+\section{Problem, conventions, and outcome}
+Let $G=(V,E)$ be a simple undirected graph, $n=|V|$, and $m=|E|$.
+A connected dominating set (CDS) is a \emph{nonempty} set $D\subseteq V$
+such that $D\cap N[v]\ne\varnothing$ for all $v\in V$ and $G[D]$ is
+connected. The decision input also includes an integer $K$, and asks for
+$|D|\le K$. A rooted instance additionally requires a specified $r\in D$.
+Under our convention the empty graph has no CDS. Inputs with $K<1$ are
+negative. Vertices and edges are explicitly represented.
+Thresholds are normalized to $0\le K\le n$ before the main algorithm;
+reading a longer initial integer representation adds its input length.
+
+\begin{theorem}[Decision and search]\label{thm:main}
+Using the interpolation algorithm in the supplied October 25, 2026
+manuscript~\cite{oai}, for every positive integer $t$ there is an algorithm
+for rooted or unrooted CDS of size at most $K$ with running time
+\[
+ t(n+m+1)^{O(1)}2^{O(\rhoN{n})}
+\]
+and $(n+m+\log(t+1)+1)^{O(1)}$ bits of space. It either returns an
+independently verifiable CDS satisfying the requirements, or reports
+``not detected.'' A negative instance never produces a witness. On a
+positive instance, failure to produce a witness has probability at most
+$2^{-t}$. The exponential parameter is $n$, even when $m=\Theta(n^2)$.
+\end{theorem}
+
+\begin{corollary}[Minimum size]\label{cor:minimum}
+Within the same bounds one can return a valid CDS that is minimum with
+probability at least $1-2^{-t}$ whenever a CDS exists. Every returned set is
+valid; optimality is probabilistic, not independently certified by the
+returned set. The rooted version minimizes subject to containing the root.
+\end{corollary}
+
+The logarithmic factors in this note deliberately use the interpolation
+route. We do not claim that our extension inherits the sharper tensor
+contraction bounds of the manuscript. The external theorem and our bridge
+are distinct from the elementary CNF identity proved next.
+
+\section{A three-variable-per-vertex parity representation}
+Fix $n\ge1$ and $r\in V$. Introduce $x_v,c_v,a_v$ for every vertex $v$.
+Here $x$ selects $D$, $c$ marks the right side of a cut of $G[D]$, and
+$a_v$ is permitted to be true only when $v$ is undominated. Let $B_{G,r}$
+consist of
+\begin{align}
+ &\neg c_v\vee x_v &&(v\in V),\label{eq:cut-subset}\\
+ &x_r,\quad\neg c_r,\label{eq:root}\\
+ &\neg c_u\vee\neg x_v\vee c_v,\quad
+   \neg c_v\vee\neg x_u\vee c_u &&(\{u,v\}\in E),\label{eq:cut-edge}\\
+ &\neg a_v\vee\neg x_w &&(v\in V,\ w\in N[v]).\label{eq:dom-flag}
+\end{align}
+All variables are declared even if subsequent simplification removes their
+occurrences. The construction has exactly $3n$ variables and
+\[
+ n+2+2m+\sum_v|N[v]|=2n+4m+2
+\]
+clauses, each of width at most three. Repeating an edge is unnecessary;
+the graph representation first deduplicates undirected edges.
+
+Write
+\[
+ u(D)=|\{v\in V:N[v]\cap D=\varnothing\}|.
+\]
+\begin{lemma}[Pointwise extension count]\label{lem:fibre}
+For every fixed assignment $x=\ind{D}$, the number of satisfying
+extensions to $c,a$ is zero if $r\notin D$, and otherwise equals
+\[
+ 2^{u(D)+\cc(G[D])-1}.
+\]
+Its parity is the indicator that $D$ is a CDS containing $r$.
+\end{lemma}
+\begin{proof}
+The root units force $r\in D$ and place its component on the left.
+Equation~\eqref{eq:cut-subset} fixes $c_v=0$ outside $D$.
+For an edge inside $D$, the two clauses in~\eqref{eq:cut-edge} force its
+endpoints to have the same cut value. An edge with an endpoint outside
+$D$ adds no further restriction. Consequently each component other than
+the root component chooses its side independently, giving
+$2^{\cc(G[D])-1}$ cuts. The clauses in~\eqref{eq:dom-flag} force $a_v=0$
+when $v$ is dominated, and otherwise leave $a_v$ free. These independent
+choices contribute $2^{u(D)}$. Both exponents are nonnegative, and their
+sum vanishes exactly when $u(D)=0$ and $\cc(G[D])=1$.
+\end{proof}
+
+\subsection{Generating polynomials and a signed companion}
+Set $R_n=2^{\lceil\log_2(2n)\rceil}$, so $2n\le R_n<4n$.
+Choose integers $w_v\in\{1,\ldots,R_n\}$ and write
+$w(D)=\sum_{v\in D}w_v$. Give the true value of $x_v$ monomial weight
+$y z^{w_v}$; all other variable-value weights are one. The resulting
+ordinary nonnegative generating polynomial is
+\begin{equation}\label{eq:unsigned}
+ U_{G,r,w}(y,z)=
+ \sum_{(x,c,a)\models B_{G,r}}y^{\sum_vx_v}z^{\sum_vw_vx_v}
+ =\sum_{D\ni r}2^{u(D)+\cc(G[D])-1}y^{|D|}z^{w(D)}.
+\end{equation}
+In particular
+\begin{equation}\label{eq:parity}
+ [y^kz^W]U_{G,r,w}\bmod2
+ =|\{D\ni r:D\text{ is a CDS},\ |D|=k,\ w(D)=W\}|\bmod2.
+\end{equation}
+The ranges are $0\le k\le n$ and $0\le W\le nR_n<4n^2$, so the entire
+coefficient table has polynomial size. Units fixing any subset of the
+$x$ variables restrict the outer sum to exactly those choices; the
+underlying graph and its domination neighborhoods stay unchanged.
+
+For comparison, assigning weight $-1$ to true $a_v$ gives the signed
+polynomial
+\begin{equation}\label{eq:signed}
+ S_{G,r,w}(y,z)=
+ \sum_{\substack{D\ni r\\D\text{ dominates }G}}
+ 2^{\cc(G[D])-1}y^{|D|}z^{w(D)}.
+\end{equation}
+Indeed each undominated vertex contributes $1-1=0$ instead of $1+1=2$.
+The two polynomials have identical coefficients modulo two.
+Equation~\eqref{eq:unsigned} is sufficient for all decision and search
+claims here; negative weights and an auxiliary parity chain are unnecessary.
+The signed version remains useful as an independent validation identity.
+
+\section{The monomial-weight bridge}\label{sec:bridge}
+An ordinary unweighted counting theorem does not by itself give a
+generating polynomial at the same Boolean-variable complexity. Encoding
+all binary isolation-weight additions by a generic circuit can introduce
+$\Theta(n\log n)$ variables. We therefore verify an extension of the
+\emph{algorithm}, using its commutative-algebra product interface.
+
+\begin{proposition}[Polynomial-degree monomial weights]\label{prop:weighted}
+Fix the clause width $q$ and a constant $d$. Let $F$ be a $q$-CNF with
+$N$ declared variables and $M$ clauses. For each variable-value pair choose
+\[
+ w_i(b)=s_{i,b}y^{\alpha_{i,b}}z^{\beta_{i,b}},\qquad
+ s_{i,b}\in\{-1,1\},\quad\alpha_{i,b},\beta_{i,b}\ge0,
+\]
+where
+\[
+ A=\sum_i\max_b\alpha_{i,b}\le(N+1)^d,\qquad
+ B=\sum_i\max_b\beta_{i,b}\le(N+1)^d.
+\]
+The interpolation route in~\cite{oai} can be extended to compute
+\[
+ Z_F(y,z)=\sum_{x\models F}\prod_iw_i(x_i)
+\]
+exactly in $(N+M+1)^{O_{q,d}(1)}2^{O_{q,d}(\rhoN{N})}$ bit
+operations and polynomial space. In particular it computes all
+coefficients modulo two within those bounds.
+\end{proposition}
+
+\begin{proof}
+We track the modifications to the cited algorithm explicitly. Label names
+below identify statements in its available TeX source.
+
+\emph{Preserve exact satisfying sets during compression.}
+Apply the original disjoint sparsification, with its original parameter
+choice of order $(\log\log N)^2/\sqrt{\log N}$, to obtain sparse leaves
+on the same declared variables. In each leaf use
+\texttt{lem:greedy-hashes} unchanged: all greedy comparisons use
+\emph{unweighted} common-zero counts. Every satisfying assignment survives
+each check. The final accepted set contains no nonsatisfying assignment,
+and is therefore exactly the leaf's satisfying set. Only this final
+system receives the monomial factors. Optimizing signed values or
+individual coefficients during the greedy phase would not justify this
+set equality.
+
+\emph{Enlarge the coefficient algebra, not the Boolean domain.}
+Set $\ell=N+2$ and use
+\[
+ \mathcal A=\mathbb Q[V,y,z]/(V^\ell,y^{A+1},z^{B+1}).
+\]
+The original $V$ records powers discarded modulo $2^\ell$ in the lifted
+equation indicators. The new $y,z$ are external markers. The product
+interface \texttt{prop:general-count} accepts a commutative
+$\mathbb Q$-algebra. Append one factor of singleton scope $\{i\}$,
+\[
+ W_i(X_i)=w_i(0)+(w_i(1)-w_i(0))X_i,
+\]
+per variable. On Boolean inputs this is exactly $w_i(x_i)$.
+Give each factor--variable incidence its own input indeterminate, as in
+the cited product-degree condition. These factors add at most $N$ to
+the total degree in those independent incidence indeterminates, so the
+degree remains $O_q(N)$ after truncation in $V$.
+Their marker degrees are coefficient data and do not multiply the
+interpolation degree in its parameter $T$. Scopes and total incidences
+gain only $N$ singleton incidences. The original occurrence branching
+and replacement-form construction therefore keep their asymptotic
+bounds. A weight of a fixed variable is multiplied outside its branch
+sum exactly once; each remaining free variable keeps its unary factor.
+
+\emph{Coefficientwise recovery.}
+The original lifted-indicator congruence holds at each Boolean assignment.
+Multiplication by its integer monomial weight and summation preserve
+that congruence coefficientwise in $y,z$. Thus interpolation, followed by
+the original linear map summing retained $V$ coefficients, recovers
+$Z_F$ modulo $2^\ell$. Each assignment contributes a single monomial
+with coefficient $+1$ or $-1$, so every coefficient has absolute value
+at most $2^N$. Since $2^{\ell-1}>2^N$, centered residues recover the
+signed integer coefficients uniquely. All actual marker exponents lie
+within the stated bounds, so the marker truncations lose no desired
+term. Adding the disjoint leaf polynomials gives $Z_F$ without overcounting.
+
+\emph{Bit complexity and space.}
+Each coefficient-algebra element has
+$\ell(A+1)(B+1)$ rational coordinates, a polynomial number.
+At a replacement-form Taylor evaluation, write $d_{\rm den}$ for the
+original common denominator of a replaced input and $B_0$ for an upper
+bound on the coefficient $1$-norm of its numerator. After multiplication
+by $d_{\rm den}$, the additional factor $W_i$ has integer numerator
+norm at most $d_{\rm den}+2B_0$. If the original product denominator is
+$\Omega$, the enlarged product denominator divides
+$\Omega d_{\rm den}^{N}$, uniformly over the assignment summands.
+The numerator norm bound gains at most
+$(d_{\rm den}+2B_0)^N$. Thus its logarithm increases by only a polynomial
+quantity, using the original polynomial bounds on the replacement
+forms. Truncated polynomial multiplication preserves the same norm
+estimate. Summing exponentially many terms adds only the logarithm of
+their number to the bit bound. Apply the original rational interpolation
+separately to each marker coordinate; all coordinates share the same
+polynomially bounded interpolation data. Consequently each algebra
+operation, factor evaluation, and interpolation step has polynomial bit
+cost. Sequential leaf and branch traversal retains polynomial space.
+The number of Boolean vectors enumerated by the product routine changes
+only within the constants of its $O(N)$ degree and polylogarithmic
+incidence bounds, giving the asserted exponent.
+An empty clause returns the zero polynomial. A formula with no clauses
+returns $\prod_i(w_i(0)+w_i(1))$, retaining every declared unused variable.
+The finitely many small parameter cases are handled by direct enumeration.
+\end{proof}
+
+\subsection{A simpler bridge when only parity is needed}
+The CDS algorithm does not need exact integer coefficients. After the
+unchanged unweighted greedy phase has produced an exact accepting system,
+let $P_1,\ldots,P_h$ be its $\mathbb F_2$ equations, with $h=O(N)$,
+and let $L_j$ be their integer lifts of degree at most $q$. For Boolean
+$x$,
+\[
+ 1-L_j(x)\equiv\ind{P_j(x)=0}\pmod2.
+\]
+It therefore suffices to compute
+\[
+ K(y,z)=\sum_{x\in\{0,1\}^N}
+ \prod_{j=1}^h(1-L_j(x))\prod_{i=1}^N W_i(x_i)
+\]
+and reduce its integer coefficients modulo two. The incidence degree is
+at most $qh+N=O_q(N)$. Apply the same product routine over
+$\mathbb Q[y,z]/(y^{A+1},z^{B+1})$, with no internal $V$ marker.
+The scope argument is unchanged, and the preceding denominator and
+norm argument applies with the degree-$q$ factors $1-L_j$ in place of
+the lifted indicators. The result at the restored interpolation point
+is an integer polynomial, even though intermediate arithmetic is rational.
+Thus reduction modulo two takes place only at that point; rational
+interpolation is not performed over $\mathbb F_2$.
+This gives the same conservative time and space bound with a simpler
+final evaluator. Its integer polynomial $K$ need not equal $Z_F$;
+only their coefficients modulo two agree. The greedy comparisons
+continue to use exact ordinary counts.
+
+This proposition is an extension established in this note using the
+supplied algorithm; it is not a claim that the Lean statement~\cite{scope}
+already quantifies over such weights. It does not cover arbitrary
+exponentially large marker degrees or unrestricted large-coefficient
+weights at the same bound.
+
+\section{Isolation, one-sided decision, and recovery}\label{sec:algorithm}
+The Isolation Lemma~\cite{isolation,cutcount} states that for a nonempty
+family $\mathcal F\subseteq2^V$, independent uniform weights from
+$\{1,\ldots,R_n\}$ give a unique minimum-weight member with probability
+at least $1-n/R_n\ge1/2$. Each weight uses exactly
+$\lceil\log_2(2n)\rceil$ independent random bits, followed by adding one;
+there is no unbounded rejection-sampling loop in the stated time bound.
+
+For an unrooted instance take
+\[
+ \mathcal F_K=\{D\subseteq V:D\text{ is a CDS},\ |D|\le K\}.
+\]
+One trial samples a single weight vector and evaluates
+$U_{G,r,w}$ for every root $r$. It checks for an odd coefficient
+$[y^kz^W]U_{G,r,w}$ with $1\le k\le\min(K,n)$.
+For a rooted instance evaluate just the specified root and apply
+isolation to the family additionally constrained by $r\in D$.
+
+If no feasible CDS exists, equation~\eqref{eq:parity} makes every checked
+coefficient even, for every weight vector. If $\mathcal F_K$ is nonempty
+and has an isolated minimum-weight member $D_*$, choose any $r\in D_*$.
+For $(k_*,W_*)=(|D_*|,w(D_*))$, the only feasible CDS in that coefficient
+is $D_*$. Larger-size sets do not contribute to $y^{k_*}$, and the
+coefficient is odd. A trial therefore succeeds with probability at least
+$1/2$. Independent repetition $t$ times gives the $2^{-t}$ failure bound.
+The same weights can be shared by all roots within a trial; independence
+between roots is neither used nor required.
+The roots must be checked separately: summing their coefficient tables
+before reducing modulo two would count each $D$ exactly $|D|$ times,
+losing every even-cardinality solution.
+
+\subsection{Recovering a witness without further randomness}
+Suppose the coefficient at $(k,W)$ is odd for a root and weight vector.
+Maintain the original graph, CNF, weights, and a partial assignment to
+$x$. For each next variable $x_v$, compute the same coefficient with an
+additional unit $\neg x_v$. If it is odd, keep this unit. Otherwise keep
+$x_v$. The parent coefficient is the sum of its two child coefficients,
+so exactly one child is odd and this invariant continues. After $n$
+choices, a single $D$ remains. Lemma~\ref{lem:fibre} implies that its
+odd contribution comes from a CDS containing $r$; the selected
+coefficient also ensures $|D|=k$ and $w(D)=W$.
+
+Domination, connectivity, cardinality, and root membership can then be
+checked directly in polynomial time. No new isolation experiment is
+needed during this self-reduction. In particular, deleting excluded
+vertices from the graph would be incorrect: they still require domination.
+
+Proposition~\ref{prop:weighted} applies with $N=3n$, $M=2n+4m+2$,
+$A=n$, and $B=nR_n<4n^2$. Root enumeration, coefficient inspection,
+repetition, and $n$ recovery calls supply only polynomial factors (and
+the explicit factor $t$). This proves Theorem~\ref{thm:main}.
+
+\subsection{Minimum connected dominating set}
+Across all roots and trials, keep an odd coefficient with smallest
+cardinality index and recover its witness at the end. Let $k_*$ be the
+true optimum and apply the Isolation Lemma to the nonempty family of
+all CDSs of size exactly $k_*$. With probability at least $1/2$ per
+trial, some root has an odd coefficient at cardinality $k_*$. No
+coefficient at a smaller cardinality can be odd. Consequently the best
+recorded cardinality equals $k_*$ with probability at least $1-2^{-t}$.
+This proves Corollary~\ref{cor:minimum}, including its rooted variant.
+
+\section{What transfers beyond this example}
+The reusable interface is a fixed-width CNF with $O(n)$ declared
+variables and polynomially many clauses, whose variables include the
+solution's characteristic vector $x$. If, for each fixed $x$, its
+auxiliary-extension parity equals the desired solution predicate, then
+the monomial-weight bridge and isolation give the same kind of
+randomized subexponential decision and recovery algorithm. Unique
+extensions are unnecessary; even multiplicities are useful.
+CDS supplies such an interface even on dense graphs. Extending this
+principle to another problem still requires an explicit representation
+with the promised number of Boolean variables. It does not automatically
+give analogous bounds for Hamiltonicity or feedback vertex set.
+
+\section{Prior work, validation, and limitations}
+The consistent-cut multiplicity and isolation step are established
+Cut\&Count ingredients~\cite{cutcount}; this note does not claim them
+as new. Our construction represents the domination filter with one
+free auxiliary bit per undominated vertex and performs the required
+coefficient computations through the supplied SAT algorithm.
+The linear-variable accounting and the monomial-weight bridge are the
+specific items proved and audited here. Historical priority remains
+unconfirmed.
+
+The known linear-measure existential monadic second-order framework
+contains several local graph problems~\cite{linear}, but connectivity
+is not itself definable by existential quantification over only unary
+relations on the original graph signature~\cite{monadic}. In particular,
+a CDS verifier in that language, with a free unary predicate $D$, would
+define graph connectivity after setting $D=V$. This observation concerns
+that unaugmented signature; it does not exclude other preprocessing,
+encodings, or algorithms.
+
+The accompanying \texttt{code/connected\_domination.py} implements the
+CNF and a small exact generating-polynomial DPLL, with signed and
+unsigned modes. The independent verifier compares its coefficients
+against direct graph definitions, tests conditioning on selection bits,
+and checks recovered witnesses. Run
+\texttt{code/verify\_connected\_domination.py} to generate a JSON report
+and text summary under \texttt{workspace/}. These experiments check the representation and the
+implemented finite algorithm; they do not execute or benchmark the
+external subexponential counting algorithm.
+
+Neither polynomial above directly counts CDSs over the integers:
+disconnected selected sets have positive even multiplicity. Taking
+coefficients modulo two yields parity counts, and isolation converts
+these into randomized decision and search. Deterministic existence,
+exact CDS counting, and a practical implementation of the extended
+OpenAI counter remain separate tasks.
+
+\begin{thebibliography}{9}
+\bibitem{oai} OpenAI.
+\emph{The Exponential Time Hypothesis is False}. October 25, 2026 revision.
+\href{https://raw.githubusercontent.com/openai/math/refs/heads/main/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/main_full_version.tex}{Full manuscript source}.
+\bibitem{scope} OpenAI.
+\href{https://github.com/openai/math/blob/main/lean/docs/378.md}{Lean scope document 378}.
+\bibitem{cutcount} M. Cygan, J. Nederlof, M. Pilipczuk, M. Pilipczuk,
+J. M. M. van Rooij, J. O. Wojtaszczyk.
+\emph{Solving connectivity problems parameterized by treewidth in single exponential time}.
+\href{https://arxiv.org/abs/1103.0534}{arXiv:1103.0534}, 2011.
+\bibitem{isolation} K. Mulmuley, U. V. Vazirani, V. V. Vazirani.
+\emph{Matching is as easy as matrix inversion}.
+Combinatorica 7, 105--113, 1987.
+\bibitem{linear} R. Ganian, R. de Haan, I. Kanj, S. Szeider.
+\emph{On Existential MSO and its Relation to ETH}.
+\href{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.MFCS.2016.42}{MFCS 2016, 42:1--42:15}.
+\bibitem{monadic} R. Fagin, L. J. Stockmeyer, M. Y. Vardi.
+\emph{On Monadic NP vs. Monadic co-NP}.
+Information and Computation 120, 78--92, 1995.
+\href{https://s3.us.cloud-object-storage.appdomain.cloud/res-files/500-infcom95.pdf}{Author-hosted article}, Theorem 5.1.
+\end{thebibliography}
+\end{document}

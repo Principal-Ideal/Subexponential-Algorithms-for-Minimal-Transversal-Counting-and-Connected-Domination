@@ -1,0 +1,497 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[colorlinks=true,allcolors=blue]{hyperref}
+\usepackage{enumitem}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\MT}{\mathop{\rm MinTr}}
+\newcommand{\poly}{\mathop{\rm poly}}
+\newcommand{\ind}[1]{\mathbf 1\{#1\}}
+\newcommand{\sat}{\#\mathrm{SAT}}
+\newcommand{\eps}{\varnothing}
+\title{Linear-variable exact counting of minimal transversals\\
+\large A completed reduction, size refinement, and algorithmic consequences}
+\author{}
+\date{29 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+For an explicitly represented hypergraph with $p$ vertices and $q$ indexed
+edges, we give a polynomial-time reduction of its number of inclusion-minimal
+transversals to the difference of two ordinary width-at-most-three CNF counts.
+When $p+q\ge1$, each formula has exactly $3p+2q-1$ declared variables in the
+unoptimized construction. The reduction has no auxiliary variable per incidence
+or per pair of vertices in an edge. A uniquely extendible linear-size population
+count circuit also gives the entire cardinality distribution using polynomially
+many calls. Closed-neighborhood hypergraphs yield $5n-1$ variables for counting
+minimal dominating sets of arbitrary $n$-vertex graphs. Combining the reduction
+with the cited fixed-width SAT counting theorem gives deterministic
+subexponential time and polynomial space. The reduction and its proof are
+independent of that external theorem. The cancellation mechanism has prior
+antecedents in negative-weight model counting; no priority claim is made.
+\end{abstract}
+
+\section{Scope and main statement}
+This note studies minimal transversal counting and its
+domination and set-cover applications, including size
+refinement and witness recovery. The optional connectivity and feedback vertex
+set directions are discussed separately in Section~\ref{sec:limits}; they are
+not consequences of the private-edge theorem here. The accompanying note
+\texttt{papers/connected\_domination.tex} establishes a separate randomized
+decision and search result for connected domination using a monomial-weight
+extension of the external counting algorithm. Exact connected-domination
+counting and the feedback-vertex-set direction remain open in this project.
+
+Let $H=(U,(e_i)_{i=1}^q)$, where $U=\{1,\ldots,p\}$ and $e_i\subseteq U$.
+Repeated edges are permitted and retain distinct indices. A transversal $D$
+meets every edge. It is minimal if no proper subset is a transversal. Write
+\[
+ s=p+q,\qquad I=\sum_{i=1}^q |e_i|,\qquad
+ J=\sum_{i=1}^q\binom{|e_i|}{2}.
+\]
+Input size includes the declared vertices, edge indices, and their incidence
+lists. All polynomial bounds below refer to this explicit representation.
+
+\begin{theorem}[Two-call reduction]\label{thm:main}
+For $s\ge1$, one can construct two CNF formulas $F_0,F_1$, each of width at most
+three, such that
+\[
+ |\MT(H)|=\sat(F_0)-\sat(F_1).
+\]
+Before any simplification, each formula has
+\[
+ N=3p+2q-1,\qquad M=p+I+J+4(s-1)+1
+\]
+declared variables and clauses, respectively. The construction takes polynomial
+time and space. Fixing any subset of the $p$ selection variables gives the same
+identity for minimal transversals satisfying those fixed choices.
+For $p=q=0$, the answer is $1$ and may instead be returned directly.
+\end{theorem}
+
+This is a two-query difference reduction, not a
+parsimonious reduction, not projected model counting, and not a parity-only
+algorithm. In particular, existence cannot in general be detected merely by
+testing the satisfiability of either formula.
+
+\section{The signed identity}
+For $D\subseteq U$, define the set of its private-edge owners
+\[
+ W(D)=\{v\in D:\text{there is an }i\text{ with }e_i\cap D=\{v\}\}.
+\]
+The familiar private-edge characterization can be proved directly: if $D$ is
+a transversal, removing $v$ fails precisely when some edge meets $D$ only in
+$v$. If every one-element deletion fails, every proper-subset deletion fails
+as well, because the transversal property is upward closed. Consequently,
+\begin{equation}\label{eq:private}
+ D\in\MT(H)\quad\Longleftrightarrow\quad
+ D\text{ is a transversal and }W(D)=D.
+\end{equation}
+
+Introduce three sets of Boolean choices:
+\[
+ D,R\subseteq U,\qquad P\subseteq\{1,\ldots,q\}.
+\]
+Call $(D,R,P)$ admissible when
+\begin{equation}\label{eq:admissible}
+ R\subseteq D,\qquad
+ i\in P\ \Longrightarrow\ |e_i\cap D|\le1\text{ and }e_i\cap D\subseteq R.
+\end{equation}
+Associate the sign $(-1)^{|R|+|P|}$.
+
+\begin{lemma}[Pointwise cancellation]\label{lem:pointwise}
+For every $D\subseteq U$,
+\begin{equation}\label{eq:pointwise}
+ \sum_{\substack{R,P\\(D,R,P)\text{ admissible}}}
+ (-1)^{|R|+|P|}=\ind{D\in\MT(H)}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Fix $D$ and $R\subseteq D$. The eligible edge-index set is
+\[
+ A(D,R)=\{i:|e_i\cap D|\le1,\ e_i\cap D\subseteq R\}.
+\]
+Summing over its arbitrary subsets gives
+\[
+ \sum_{P\subseteq A(D,R)}(-1)^{|P|}
+ =\begin{cases}1&A(D,R)=\eps,\\0&A(D,R)\ne\eps.\end{cases}
+\]
+If $D$ misses an edge $e_i$, that index belongs to $A(D,R)$ for every $R$;
+the whole contribution is therefore zero. Suppose instead that $D$ is a
+transversal. Every eligible edge has a unique intersection vertex in $R$.
+Thus $A(D,R)=\eps$ exactly when $R\cap W(D)=\eps$. It follows that the left
+side of \eqref{eq:pointwise} is
+\[
+ \sum_{R\subseteq D\setminus W(D)}(-1)^{|R|}
+ =\begin{cases}1&D\setminus W(D)=\eps,\\0&\text{otherwise}.\end{cases}
+\]
+Equation~\eqref{eq:private} finishes the proof, including $D=\eps$.
+\end{proof}
+
+For example, take $U=\{1,2\}$ and the single edge $\{1,2\}$. The contributions
+of $D=\eps,\{1\},\{2\},\{1,2\}$ are respectively $0,1,1,0$. The signed sum
+is $2$, regardless of how many identical copies of that edge are indexed.
+
+\subsection{Simplifying the earlier four-set construction}
+The earlier four-set construction used $D,T,P,Q$ and sign
+$(-1)^{|D|+|T|+|P|+|Q|}$. Its separate $Q$ filter for missed edges is unnecessary:
+a missed edge already makes the corresponding $P$ bit free, hence cancels.
+Removing $Q$ leaves a valid signed sum. Substituting $R=D\setminus T$ gives
+\eqref{eq:admissible}, and
+\[
+ |D|+|T|\equiv |R|\pmod2.
+\]
+This also removes the $D$ bits from the parity circuit. The improvement is in
+variable count; many clauses are still permitted.
+
+\section{Explicit width-three formulas}
+Use variables $x_v$ for $v\in D$, $r_v$ for $v\in R$, and $a_i$ for $i\in P$.
+The base formula $B_H$ consists of the following clauses:
+\begin{align}
+ &\neg r_v\vee x_v &&(v\in U),\label{eq:c1}\\
+ &\neg a_i\vee\neg x_v\vee r_v &&(v\in e_i),\label{eq:c2}\\
+ &\neg a_i\vee\neg x_v\vee\neg x_w
+ &&(\{v,w\}\subseteq e_i,\ v\ne w).\label{eq:c3}
+\end{align}
+Its $2p+q$ variables and $p+I+J$ clauses express precisely
+\eqref{eq:admissible}. In \eqref{eq:c3} each unordered pair is used once.
+The construction does not introduce a variable for an incidence or a pair.
+
+Order the $s$ variables in $(r_1,\ldots,r_p,a_1,\ldots,a_q)$ as
+$b_1,\ldots,b_s$. Compute their parity using $s-1$ successive XOR gates, with
+the first bit as the initial wire. Encode an XOR $z=u\mathbin\oplus v$ by
+\begin{equation}\label{eq:xor}
+ (u\vee v\vee\neg z)\wedge
+ (u\vee\neg v\vee z)\wedge
+ (\neg u\vee v\vee z)\wedge
+ (\neg u\vee\neg v\vee\neg z).
+\end{equation}
+Conjoin a unit clause fixing the final parity wire to $j$ to obtain $F_j$.
+For $s=1$, that wire is $b_1$ itself. Every base assignment has exactly one
+extension to the XOR variables, so the difference of the two model counts
+equals the signed sum of Lemma~\ref{lem:pointwise}. The variable and clause
+counts in Theorem~\ref{thm:main} follow. Additional unit clauses on $x$ restrict
+the outer sum over $D$, establishing the theorem's conditioning assertion.
+
+All variables must remain declared in a DIMACS export, even when unused in
+the base constraints. In particular, an empty edge has a free $a_i$ before
+parity is imposed; omitting it would destroy cancellation. Width less than
+three is allowed by the imported counting theorem. If exactly three literal
+positions are required by an interface, repeating a literal does not change
+any model count.
+
+\subsection{Boundary cases}
+An empty edge forces the answer to zero and is also handled by the formula.
+When $q=0$, the unique minimal transversal is $\eps$, including if $p>0$.
+When $p=0<q$, every edge is empty and the answer is zero. Repeated edges do
+not affect the proof; they merely create more eligible indices in a cancelling
+sum. An isolated vertex cannot belong to a minimal transversal: it never lies
+in $W(D)$. Isolated graph vertices are different, since their closed
+neighborhoods are singleton edges and must be selected in a dominating set.
+
+\section{Cardinality distributions with linear overhead}\label{sec:size}
+Define
+\[
+ m_k(H)=|\{D\in\MT(H):|D|=k\}|,\qquad
+ M_H(z)=\sum_{k=0}^p m_k(H)z^k.
+\]
+The pointwise lemma implies the polynomial identity
+\[
+ M_H(z)=\sum_{(D,R,P)\text{ admissible}}(-1)^{|R|+|P|}z^{|D|}.
+\]
+To extract a coefficient, conjoin a deterministic circuit testing
+$\sum_v x_v=k$. A generic sequential binary accumulator would cost
+$O(p\log p)$ gates; the following balanced construction costs $O(p)$.
+
+For $p\ge1$, pad the input with constant zeros to $b=2^h$, the smallest power
+of two at least $p$. At level $j=1,\ldots,h$, use $b/2^j$ additions of two
+$j$-bit numbers. The low bit uses one half adder; each remaining bit uses a
+full adder. A half adder needs two output variables (XOR and AND) and seven
+clauses. A full adder uses two XOR outputs for its sum and a majority output
+for its carry: three variables and fourteen clauses. A carry $c$ for input
+bits $u,v,w$ is enforced by
+\[
+ \bigwedge_{\{\alpha,\beta\}\subseteq\{u,v,w\}}
+ [ (\neg\alpha\vee\neg\beta\vee c)
+   \wedge(\alpha\vee\beta\vee\neg c) ].
+\]
+All clauses have width at most three and uniquely determine the output bits.
+Constants and aliases can be simplified without adding variables. An
+unsimplified upper bound on new variables is
+\begin{equation}\label{eq:adder}
+ A_p\le\sum_{j=1}^h\frac b{2^j}(3j-1)
+ =5b-3h-5<10p,
+\end{equation}
+and on gate clauses it is
+\[
+ \sum_{j=1}^h\frac b{2^j}(14j-7)=21b-14h-21<42p.
+\]
+Finally fix the $h+1$ output bits to the binary expansion of $k$. For $p=1$
+there are no additions; for $p=0$ the constraint is constant. An out-of-range
+$k$ gives count zero.
+
+\begin{corollary}\label{cor:size}
+For every $k$, $m_k(H)$ is the difference of two width-three counts on
+$3p+2q-1+O(p)$ variables. All $p+1$ coefficients are obtainable with
+$2(p+1)$ oracle calls (apart from trivial cases). Every gate extension is
+unique, so there is no unintended witness multiplicity.
+\end{corollary}
+
+Threshold comparison with $k$ also has $O(\log(p+2))$ extra gates after the
+same population count. Thus maximum feasible cardinality can alternatively
+be found with $O(\log(p+2))$ count-difference tests of the monotone predicate
+``there exists a minimal transversal of size at least $k$''.
+
+\section{Consequences of the external SAT theorem}\label{sec:time}
+We use the October 25 manuscript's fixed-width counting theorem as an
+external algorithmic input~\cite{oai}. Its main theorem gives, for fixed
+width, time
+\[
+ (N+M)^{O(1)}2^{O(N\log\log N/\sqrt{\log N})}
+\]
+and polynomial space. For $M=O(N)$ the exponential factor improves to
+$2^{O(N/\sqrt{\log N})}$, with constants depending on the density bound.
+The linked Lean scope document~\cite{scope} states the weaker factor
+$2^{O(N(\log\log N)^2/\sqrt{\log N})}$ for canonical encodings, also with
+polynomial space. We have inspected the stated theorem and scope; this work
+does not rebuild that formalization or reprove its algorithm. The sharper
+bound below uses the manuscript, not a claim that the sharper exponent was
+Lean-verified.
+
+For small arguments, replace logarithms by $\log(s+16)$ and
+$\log\log(s+16)$; this does not change the asymptotics.
+
+\begin{corollary}\label{cor:time}
+Using the cited manuscript theorem, $|\MT(H)|$ and its entire cardinality
+distribution are computable deterministically in
+\begin{equation}\label{eq:time}
+ (s+I+1)^{O(1)}
+ 2^{O(s\log\log(s+16)/\sqrt{\log(s+16)})}
+\end{equation}
+time and polynomial space. If only the documented Lean scope is used, replace
+the numerator's $\log\log$ by $(\log\log)^2$.
+If $I+J=O(s)$, the manuscript yields
+\[
+ (s+I+1)^{O(1)}2^{O(s/\sqrt{\log(s+16)})}.
+\]
+In particular, the last bound applies to hypergraphs of fixed maximum edge
+size, with constants depending on that size.
+\end{corollary}
+\begin{proof}
+We have $N=O(s)$ and $M=O(s+I+J)$, while $J\le pI/2$. Ordinary binary-index
+encodings have polynomial bit length. The canonical encoding described in
+the Lean comparator uses unary indices and still has polynomial bit length
+for these formulas. Thus all input factors remain polynomial. For a fixed
+cardinality the additional variables and clauses are $O(p)$; polynomially
+many sequential calls preserve the bound and polynomial space. If
+$I+J=O(s)$ then $M=O(N)$, including the size circuit. Each oracle answer has
+at most $N+1$ bits, so exact subtraction requires only polynomial resources.
+\end{proof}
+
+\subsection{Minimal dominating sets and upper domination}
+For a simple undirected graph $G=(V,E)$, use the indexed hypergraph
+$(V,(N[v])_{v\in V})$. A set is a minimal transversal exactly when it is a
+minimal dominating set~\cite{bbcw}. For $n=|V|\ge1$, we obtain
+\[
+ N=5n-1,\qquad
+ M=10n+2|E|-3+\sum_{v\in V}\binom{\deg(v)+1}{2}.
+\]
+The expression for $M$ follows by substituting $p=q=n$ and
+$I=n+2|E|$ in Theorem~\ref{thm:main}. Even for dense graphs it is $O(n^3)$,
+and the running time in \eqref{eq:time} depends exponentially only on $n$.
+Fixed maximum degree gives the improved exponent $O(n/\sqrt{\log n})$.
+
+Upper domination asks for the largest cardinality of a minimal dominating
+set~\cite{upper}. Computing the distribution and taking its largest nonzero
+index solves it within the same time bound. A graph always has a minimal
+dominating set, including the empty graph under the empty-set convention.
+
+\subsection{Minimal set covers and other direct applications}
+Given $a$ indexed selectable sets over $b$ universe elements, take one
+hypergraph vertex per selectable set and one edge per element, consisting
+of the sets that contain it. Minimal covers correspond bijectively to
+minimal transversals. The parameter is $a+b$, not the number of incidences;
+duplicates among selectable sets remain distinct choices. An uncovered
+element gives an empty edge and zero covers.
+
+The same statement counts minimal satisfying assignments of a monotone CNF,
+using its variables as vertices and clauses as edges. Open neighborhoods
+instead of closed neighborhoods give minimal total dominating sets; a graph
+with an isolated vertex then has count zero. Complementation gives maximal
+independent vertex sets of a hypergraph, where independence means containing
+no entire edge. These are consequences of the same reduction, not separate
+core constructions.
+
+\subsection{Witnesses and exact sampling}
+Because Lemma~\ref{lem:pointwise} holds for each $D$, adding units on $x$
+gives exact nonnegative conditional counts even though the internal counts
+are subtracted. If a target count is positive, fix the selection variables
+successively to a branch with positive conditional count. This recovers one
+minimal transversal of a specified feasible size in $O(p)$ additional pairs
+of calls. It also recovers an upper dominating set after finding its size.
+Selecting each branch with probability equal to its conditional count divided
+by the parent count gives an exactly uniform sample. Exact integer rejection
+sampling supplies these probabilities with polynomial expected overhead.
+These are algorithms for objects represented by the $x$ bits, not uniform
+sampling of the auxiliary SAT assignments.
+
+\section{Prior work and claim discipline}\label{sec:prior}
+The private-edge characterization, the neighborhood-hypergraph correspondence,
+inclusion--exclusion, and uniquely extendible gate encodings are established
+ingredients. Prior negative-weight model-counting transformations specifically
+eliminate existential witnesses by cancellation~\cite{skolem}. It would be
+incorrect to claim that the general cancellation idea was invented here.
+
+The supplied related preprint~\cite{claude} already handles ordinary dominating
+set counting, including cardinality restrictions, in Corollary~7. Minimality
+is an additional condition and cannot be obtained merely by renaming that
+result. The present note supplies an explicit construction and its variable
+accounting. Moreover, the existing negative-weight technique already gives
+the same asymptotic linear-variable existence result by the specialization
+below. Thus that existence result alone is not a defensible methodological
+novelty claim. Whether this exact application or its tighter constant was
+published previously remains unconfirmed; search failure is not a priority proof.
+
+\subsection{An explicit specialization of the earlier technique}
+Here is our parameter accounting for a baseline obtained by specializing the
+negative-weight rules of Definition~3 and Proposition~5 in~\cite{skolem}.
+This derivation makes the relationship checkable rather than merely comparing
+keywords. Use variables $x_v,u_v$ and $b_i,c_i,t_i$, giving $2p+3q$ variables.
+Assign weight $-1$ to a false $u_v,c_i,t_i$ and weight $+1$ to every other
+variable-value pair. Include
+\begin{align*}
+ &(b_i\vee\neg x_v\vee\neg x_w),\quad
+   (c_i\vee\neg x_v\vee\neg x_w)
+   &&(\{v,w\}\subseteq e_i),\\
+ &(c_i\vee b_i) &&(i\in[q]),\\
+ &(t_i\vee\neg x_v) &&(v\in e_i),\\
+ &(u_v\vee x_v) &&(v\in U),\\
+ &(u_v\vee b_i) &&(v\in e_i).
+\end{align*}
+Fix $x$. Summing over $c_i$ enforces, with weight one,
+$b_i=\ind{|e_i\cap D|\ge2}$: if a pair is selected both $b_i,c_i$ are forced
+true; if no pair is selected, false $b_i$ forces true $c_i$, whereas true
+$b_i$ leaves $c_i$ free and cancels. Summing over $t_i$ enforces that $e_i$
+is hit. Once all edges are hit and $b$ has the indicated values, summing over
+$u_v$ enforces $\neg x_v\vee\bigvee_{i:v\in e_i}\neg b_i$, which is exactly
+private-edge availability for each selected vertex. These filters contribute
+one precisely for minimal transversals and zero otherwise.
+
+There are $p+2q$ signed bits. Their number of false values has the parity of
+their number of true values plus the fixed constant $p+2q$. A parity chain
+therefore converts this baseline to two ordinary counts with
+$3p+5q-1$ variables for $p+q\ge1$, merely swapping the two counts when that
+constant is odd. Theorem~\ref{thm:main} saves $3q$ variables relative to this
+particular baseline. Neither construction is asserted optimal. This comparison
+supports an expository or application contribution, not a claim that prior
+methods cannot obtain a linear-variable reduction.
+
+For beta-acyclic hypergraphs, polynomial-time minimal transversal counting
+was already known; the neighborhood connection also gives results on strongly
+chordal graphs~\cite{bbcw}. Those tractable subclasses do not imply the present
+arbitrary-incidence bound. Conversely, a general subexponential bound is not
+a claim to improve those polynomial-time algorithms.
+
+The deliverable is a proved and reproducible reduction with explicit
+algorithmic corollaries. Its status is a research note, not a claim of
+publication-ready novelty or a new proof of the external ETH result.
+
+\section{Verification and reproducibility}\label{sec:verify}
+The accompanying standard-library Python implementation is in
+\texttt{code/}. It generates the actual two CNFs, optionally adds the balanced
+cardinality circuit, and exports ordinary DIMACS. Its exact DPLL counter is
+a small-instance verification oracle, not an implementation of the cited
+subexponential algorithm. Unit propagation and free-variable factors must
+preserve declared-variable semantics.
+
+Validation compares three independently expressed objects: direct enumeration
+of minimal transversals; the signed identity, with the $P$ sum factored; and,
+on smaller cases, the difference of actual generated CNF model counts.
+The verification suite checks all 278 simple hypergraphs on zero through three
+vertices using actual CNF counts, both in total and by size (2,720 oracle
+calls in that exhaustive section). All 65,536 simple hypergraphs on four
+vertices are checked against both factored signed identities, not exhaustively
+through the CNF oracle. It also covers gate truth tables, unique extension,
+random CNFs for the DPLL oracle, repeated-edge cases, all 76 simple graphs on
+zero through four vertices, and set-cover examples. The prior-technique
+baseline is independently checked on all 22 simple hypergraphs with at most
+two vertices, including all 74 fixed-$D$ contributions (192 oracle calls).
+Running \texttt{code/verify.py} generates a report with coverage and running times
+under \texttt{workspace/}.
+The proof above, not a finite test suite, establishes the general result.
+The local reduction itself has not been formalized in Lean.
+
+\section{Limits of the two optional directions}\label{sec:limits}
+For connected dominating sets, a consistent-cut filter with a fixed root
+counts $2^{c-1}$ cuts when there are $c$ components~\cite{cutcount}. This
+removes disconnected objects modulo two but leaves positive multiplicities
+over the integers. A spanning-tree certificate similarly weights a set by
+its number of spanning trees. Neither observation supplies a one-per-object
+integer count. The present private-edge argument relies on monotonicity and
+independent local witnesses; it supplies no such connectivity filter.
+The separate note \texttt{papers/connected\_domination.tex} instead proves a
+$3n$-variable parity representation, a polynomial-marker extension of the
+external interpolation algorithm, and randomized subexponential decision,
+search, and minimum-size optimization. Its parity argument does not resolve
+the exact integer counting question discussed in this paragraph.
+
+For bounded-degree feedback vertex set, a graph is acyclic precisely when
+its retained vertices meet no cycle in full. Turning every cycle into a
+hyperedge can produce exponentially many edges even at bounded degree.
+The parameter $p+q$ would then be too large, and our theorem gives no desired
+bound. An ordering encoding with $O(n\log n)$ bits also does not suffice:
+substitution into the imported exponent yields order
+$n\sqrt{\log n}\log\log n$, which is not $o(n)$.
+No low-variable fixed-width reduction for this direction is established here.
+These are remaining mathematical problems, not implementation tasks already
+completed by the main theorem.
+
+Finally, fast counting does not imply subexponential total-time enumeration.
+A disjoint union of triangles has $3^{n/3}$ minimal dominating sets (one
+vertex per triangle), so simply writing them all already takes exponential
+time. The sampling and single-witness procedures do not contradict this.
+
+\begin{thebibliography}{9}
+\bibitem{oai} OpenAI.
+\emph{The Exponential Time Hypothesis is False}.
+17 October 2026, revised 25 October 2026, main theorem.
+\href{https://github.com/openai/math/blob/main/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/paper.pdf}{Manuscript};
+\href{https://raw.githubusercontent.com/openai/math/refs/heads/main/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/main_full_version.tex}{source}.
+
+\bibitem{scope} OpenAI.
+\emph{Lean formalization scope, problem 378}.
+Accessed 29 October 2026.
+\href{https://github.com/openai/math/blob/main/lean/docs/378.md}{Scope document};
+\href{https://github.com/openai/math/blob/main/lean/ComparatorChallenges/SubexponentialSAT.lean}{comparator statement}.
+
+\bibitem{claude} Claude / Anthropic.
+\emph{A $2^{o(n)}$ Time Algorithm for 3-SAT}.
+26 October 2026, preprint 2610.00577v1, Corollary 7, pp.21--22.
+\href{https://hexagonmath.org/pdf/2610.00577v1}{Primary manuscript}.
+
+\bibitem{bbcw} B. Bergougnoux, F. Capelli, and M. Kant\'e.
+\emph{Counting Minimal Transversals of Beta-Acyclic Hypergraphs}.
+\href{https://arxiv.org/abs/1808.05017}{arXiv:1808.05017}.
+
+\bibitem{skolem} G. Van den Broeck, W. Meert, and A. Darwiche.
+\emph{Skolemization for Weighted First-Order Model Counting}.
+KR 2014.
+\href{https://arxiv.org/abs/1312.5378}{arXiv:1312.5378}.
+
+\bibitem{upper} C. Bazgan et al.
+\emph{Algorithmic Aspects of Upper Domination}.
+\href{https://arxiv.org/abs/1506.07260}{arXiv:1506.07260}.
+
+\bibitem{cutcount} M. Cygan et al.
+\emph{Solving connectivity problems parameterized by treewidth in single
+exponential time}.
+\href{https://arxiv.org/abs/1103.0534}{arXiv:1103.0534}.
+\end{thebibliography}
+\end{document}

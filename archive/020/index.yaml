@@ -1,0 +1,8 @@
+id: "020"
+title: "Short-edge direct and long-edge cancellation hybrid"
+status: established
+result: "Fix d>=2. In an indexed hypergraph on p vertices, let q_L count edges of size greater than d and s=p+q_L. Encoding short edges directly and only long edges by cancellation gives two formulas of width at most max(d,3) on exactly 2p+q_L+max(0,s-1) declared variables whose count difference is the number of minimal transversals, also pointwise in the selected vertex set. For s>0 this is 3p+2q_L-1 variables. The zero-sign case is handled by an unchanged even formula and an inconsistent odd formula."
+primary_proof:
+  method: hand
+  requires: ["005", "006"]
+  motivated_by: []

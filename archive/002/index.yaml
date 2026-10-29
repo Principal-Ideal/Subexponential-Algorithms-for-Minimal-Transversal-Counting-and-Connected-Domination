@@ -1,0 +1,8 @@
+id: "002"
+title: "OpenAI algebra-valued product-sum evaluator"
+status: imported
+result: "Import the OpenAI rational-interpolation product-sum evaluator over a commutative Q-algebra under its stated bounds on independent-incidence degree, factor scopes, layout, sparse representation, and arithmetic heights. Its measurement separation, Boolean-difference recovery, layout, rational parity lift, total-order truncation, and exact readout lemmas are part of the contract. This does not assert that arbitrary large algebras or arbitrary assignment weights have negligible overhead."
+primary_proof:
+  method: external
+  requires: []
+  motivated_by: []

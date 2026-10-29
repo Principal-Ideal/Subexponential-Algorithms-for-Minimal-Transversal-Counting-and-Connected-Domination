@@ -1,0 +1,8 @@
+id: "007"
+title: "Linear-size unique-extension cardinality circuit"
+status: established
+result: "The equality sum_{v=1}^p x_v=k can be imposed with width-three functional gate clauses and O(p) additional Boolean variables, with exactly one extension for every input satisfying the equality. For p>=2, let b=2^h be the least power of two at least p. A padded balanced adder has at most 5b-3h-5<10p gate variables and 21b-14h-21<42p gate clauses, followed by h+1 output units; constants and p<=1 admit direct simplification."
+primary_proof:
+  method: hand
+  requires: []
+  motivated_by: []

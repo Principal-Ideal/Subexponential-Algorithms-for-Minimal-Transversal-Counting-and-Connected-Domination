@@ -1,0 +1,8 @@
+id: "010"
+title: "Prior negative-weight transformations recover the compact gadget"
+status: established
+result: "The negative-weight elimination rule sum_{a: a implies E} (-1)^a=1-[E] is a specialization of the previously published relaxed Tseitin transformation. Applying it to each exceptional-edge predicate in the compact minimal-transversal construction recovers the same 2p+q-variable base CNF after elementary simplification. Therefore fewer variables than the project's unoptimized 2p+3q Skolem baseline does not establish superiority over optimized prior methods or a new negative-weight principle."
+primary_proof:
+  method: hand
+  requires: ["005"]
+  motivated_by: []

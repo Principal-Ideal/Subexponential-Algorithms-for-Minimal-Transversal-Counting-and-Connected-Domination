@@ -1,0 +1,8 @@
+id: "005"
+title: "Compact pointwise cancellation for minimal transversals"
+status: established
+result: "For an indexed hypergraph with p vertices, q edges, total incidence L, and B=sum_e binom(|e|,2), a width-at-most-three CNF on 2p+q variables x,r,a and p+L+B raw clauses has signed auxiliary sum equal, for every fixed x, to the indicator that D={v:x_v=1} is a minimal transversal. Its sign is (-1)^(sum r+sum a). This is an integer cancellation identity, not a parsimonious reduction."
+primary_proof:
+  method: hand
+  requires: ["004"]
+  motivated_by: []

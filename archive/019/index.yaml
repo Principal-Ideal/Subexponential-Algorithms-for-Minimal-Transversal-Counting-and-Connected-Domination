@@ -1,0 +1,8 @@
+id: "019"
+title: "Exponential deletion families despite directed FVS one"
+status: established
+result: "For every integer t>=1, the 3-CNF F_t=AND_i [((not c) OR a_i OR b_i) AND ((not a_i) OR c) AND ((not b_i) OR c)] has a bidirected-star dependency graph of directed feedback vertex number one, yet every complete fixed deletion-evidence family contains at least 2^t distinct sets. For each choice of one variable from every pair {a_i,b_i}, the model consisting of those choices and c has the empty model as its only strict submodel, forcing that entire model to occur in the family."
+primary_proof:
+  method: hand
+  requires: ["017"]
+  motivated_by: ["018"]

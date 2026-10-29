@@ -1,0 +1,8 @@
+id: "004"
+title: "Private-edge criterion for minimal transversals"
+status: established
+result: "For an indexed finite hypergraph, a hitting set D is inclusion-minimal exactly when every v in D has a private edge e with e intersect D equal to {v}. The statement permits repeated edges, empty edges, isolated vertices, and an empty edge family, with the usual empty-set conventions."
+primary_proof:
+  method: hand
+  requires: []
+  motivated_by: []

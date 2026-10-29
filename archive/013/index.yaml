@@ -1,0 +1,8 @@
+id: "013"
+title: "Connected-domination parity generating polynomial"
+status: established
+result: "Weighting a selected vertex by Y Z^{w_v} in the rooted three-variable-per-vertex CNF makes every coefficient modulo two equal the parity of rooted connected dominating sets of that size and total vertex weight. This holds for both the unsigned and signed domination-flag versions. A nonzero parity coefficient certifies existence; a zero coefficient alone does not certify absence. Rooted polynomials must be queried separately rather than summed over all roots."
+primary_proof:
+  method: hand
+  requires: ["012"]
+  motivated_by: []

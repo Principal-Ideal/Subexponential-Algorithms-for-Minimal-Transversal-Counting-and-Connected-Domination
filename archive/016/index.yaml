@@ -1,0 +1,8 @@
+id: "016"
+title: "Conditional probabilistic minimum connected domination"
+status: conditional
+result: "Under the unary monomial-weight bridge, inspect all roots and all coefficients for each of t independent weight trials, retain the smallest detected feasible size, and perform witness self-reduction once. With probability at least 1-2^(-t), the result is a minimum-size nonempty connected dominating set within an optional size cap whenever one exists. Any returned witness is deterministically feasible, but optimality is probabilistic and is not certified by the witness. The time has the conservative n-subexponential exponent and polynomial space of the bridge."
+primary_proof:
+  method: hand
+  requires: ["003", "011", "013", "015"]
+  motivated_by: []
